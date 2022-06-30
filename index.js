@@ -17,10 +17,18 @@ const client = new MongoClient(uri, { useNewUrlParser: true, useUnifiedTopology:
 async function run() {
     try {
         await client.connect()
-        const datacollection = client.db('todo').collection('todo-data')
+        const datacollection = client.db('todo').collection('todo-data');
+        const completedCollection = client.db('todo').collection('completed');
+
         app.post('/todo', async (req, res) => {
             const data = req.body;
             const result = await datacollection.insertOne(data)
+            res.send(result)
+        })
+
+        app.post('/complete', async (req, res) => {
+            const data = req.body;
+            const result = await completedCollection.insertOne(data)
             res.send(result)
         })
 
@@ -30,11 +38,24 @@ async function run() {
             res.send(result)
         })
 
+        app.get('/complete', async (req, res) => {
+            const query = {}
+            const result = await completedCollection.find(query).toArray()
+            res.send(result)
+        })
+
 
         app.delete('/todo/:id', async (req, res) => {
             const id = req.params.id;
             const query = { _id: ObjectId(id) }
             const result = await datacollection.deleteOne(query)
+            res.send(result)
+        })
+
+        app.delete('/complete/:id', async (req, res) => {
+            const id = req.params.id;
+            const query = { _id: ObjectId(id) }
+            const result = await completedCollection.deleteOne(query)
             res.send(result)
         })
     }
