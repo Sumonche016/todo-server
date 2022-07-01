@@ -58,6 +58,19 @@ async function run() {
             const result = await completedCollection.deleteOne(query)
             res.send(result)
         })
+
+
+        app.put('/update/:id', async (req, res) => {
+            const id = req.params.id;
+            const task = req.body;
+            const filter = { _id: id };
+            const options = { upsert: true };
+            const updateDoc = {
+                $set: task,
+            }
+            const result = await datacollection.updateOne(filter, updateDoc, options)
+            res.send(result)
+        })
     }
     finally {
 
